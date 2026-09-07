@@ -1,41 +1,88 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 
 const app = express();
-const port = process.env.PORT || 3001;
-const jwtSecret = process.env.JWT_SECRET || 'change-me-in-production';
+app.use(cookieParser());
 
-function verifyJwt(req, res, next) {
-  const authorization = req.headers.authorization || '';
-  const cookieToken = (req.headers.cookie || '').split(';').map((part) => part.trim())
-    .find((part) => part.startsWith('sso_token='));
-  const tokenFromCookie = cookieToken ? decodeURIComponent(cookieToken.slice('sso_token='.length)) : null;
-  const token = authorization.startsWith('Bearer ')
-    ? authorization.slice('Bearer '.length)
-    : tokenFromCookie;
+// ดึงค่า JWT_SECRET และ PORT จาก Environment
+const JWT_SECRET = process.env.JWT_SECRET || 'kmitl_chumphon_sso_secret_key';
+const PORT = process.env.PORT || 4000;
 
-  if (!token) {
-    return res.redirect(`/auth/?returnTo=${encodeURIComponent(req.originalUrl)}`);
-  }
 
-  try {
-    req.user = jwt.verify(token, jwtSecret);
-    return next();
-  } catch (_error) {
-    return res.status(401).json({ error: 'Invalid or expired token' });
-  }
-}
+// Middleware: ตรวจสอบ JWT Token
+const verifyToken = (req, res, next) => {
 
-app.get('/health', (_req, res) => {
-  res.json({ service: 'web-app-1', status: 'ok' });
+    // 1. ดึง Token จาก Cookie
+    const token = req.cookies.sso_token;
+
+    // 2. ถ้าไม่มี Token ให้ไปหน้า Login
+    if (!token) {
+        return res.redirect('/auth');
+    }
+
+    try {
+        // 3. ตรวจสอบ Token และ Signature
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        // เก็บข้อมูล User
+        req.user = decoded;
+
+        // อนุญาตให้ไปต่อ
+        next();
+
+    } catch (error) {
+
+        // Token ปลอมหรือหมดอายุ
+        return res.redirect('/auth');
+    }
+};
+
+
+// Route หน้าแรก
+app.get('/', verifyToken, (req, res) => {
+
+    // ดึงข้อมูล User จาก Token
+    const user = req.user;
+
+    // สร้างหน้า HTML
+    let html = `
+        <h1>ยินดีต้อนรับรหัส: ${user.student_id || 'ไม่ระบุ'}</h1>
+    `;
+
+    // ทุกคนสามารถเห็นปฏิทิน
+    html += `
+        <button>ปฏิทินการศึกษา</button>
+        <br><br>
+    `;
+
+    // Authorization ตรวจสอบ Role
+    if (user.role === 'student' || user.role === 'admin') {
+
+        html += `
+            <button style="background-color: green; color: white;">
+                ดูเกรด
+            </button>
+
+            <button style="background-color: blue; color: white;">
+                ลงทะเบียนเรียน
+            </button>
+        `;
+
+    } else {
+
+        html += `
+            <p style="color:red;">
+                คุณไม่มีสิทธิ์เข้าถึงเมนูดูเกรดและลงทะเบียนเรียน
+            </p>
+        `;
+    }
+
+    res.send(html);
 });
 
-app.get('/', verifyJwt, (req, res) => {
-  res.type('html').send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Lab App</title></head>
-<body><h1>Lab Reservation System</h1><p>Signed in as <strong>${req.user.sub}</strong>.</p>
-<p>JWT verified by Web App 1.</p></body></html>`);
-});
 
-app.listen(port, () => {
-  console.log(`Web App 1 listening on port ${port}`);
+// เปิด Server
+app.listen(PORT, () => {
+    console.log(`Web App 1 is running on port ${PORT}`);
 });
