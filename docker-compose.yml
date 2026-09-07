@@ -1,0 +1,49 @@
+services:
+  freeradius:
+    build: ./freeradius
+    container_name: sso_radius
+    ports:
+      - "1812:1812/udp"
+    networks:
+      - sso_net
+
+  central-auth:
+    build: ./central-auth
+    container_name: sso_central_auth
+    environment:
+      PORT: 3000
+      RADIUS_HOST: freeradius
+      RADIUS_PORT: 1812
+      RADIUS_SECRET: testing123
+      JWT_SECRET: change-this-jwt-secret
+      COOKIE_SECURE: "false"
+    depends_on:
+      - freeradius
+    networks:
+      - sso_net
+
+  web-app-1:
+    build: ./web-app-1
+    container_name: sso_web_app_1
+    environment:
+      PORT: 3001
+      JWT_SECRET: change-this-jwt-secret
+    networks:
+      - sso_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: sso_nginx_proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - central-auth
+      - web-app-1
+    networks:
+      - sso_net
+
+networks:
+  sso_net:
+    driver: bridge
