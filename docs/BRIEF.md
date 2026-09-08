@@ -79,13 +79,7 @@ TODO:
 ---
 
 # 5. Main Features
-
 TODO:
-
-ระบบต้องมี Feature อะไรบ้าง?
-
-ตัวอย่าง:
-
 - Central Login
 - RADIUS Authentication
 - JWT Authentication
@@ -94,11 +88,20 @@ TODO:
 - Role-based Authorization
 - Web Application
 - Reverse Proxy
+- Action Trigger
 
 รายการ Feature จริง:
 
 TODO:
-
+- Central Login
+- RADIUS Authentication
+- JWT Authentication
+- Single Sign-On
+- Logout
+- Role-based Authorization
+- Web Application
+- Reverse Proxy
+- Action Trigger
 
 ---
 
@@ -108,15 +111,13 @@ TODO:
 
 | Component | Responsibility |
 |---|---|
-| Nginx | TODO |
-| Central Auth | TODO |
-| RADIUS | TODO |
-| Web App | TODO |
-| Database | TODO |
-
-เพิ่ม Component ถ้ามี:
-
-TODO:
+| Nginx | ทำหน้าที่เป็น Reverse Proxy เพื่อรับ Request จากผู้ใช้, จัดการเรื่องความปลอดภัยและส่งต่อ Traffic ไปยัง Web App หรือ Central Auth |
+| Central Auth | จัดการระบบยืนยันตัวตนและการออก Token หรือจัดการ Session เพื่อรองรับระบบ "ล็อกอินครั้งเดียวไม่ต้องเข้าซ้ำ" สำหรับผู้ที่ต้องการเข้ามาดูเกรดและปฏิทินการศึกษา |
+| RADIUS | ทำหน้าที่เชื่อมต่อกับฐานข้อมูลกลางเพื่อตรวจสอบบัญชีผู้ใช้ของนักศึกษาในขั้นตอนการล็อกอินครั้งแรก |
+| Web App | แอปพลิเคชันหลักสำหรับดึงข้อมูลและแสดงผลโดยจะตรวจสอบสถานะการล็อกอินจาก Token/Session ก่อนอนุญาตให้เข้าถึงข้อมูล |
+| Database | ฐานข้อมูลหลักของระบบ ใช้เก็บข้อมูลปฏิทินการศึกษา, ข้อมูลผู้ใช้งานเบื้องต้น, แคชข้อมูลเกรดและประวัติการเข้าใช้งาน |
+| Redis | ใช้เก็บข้อมูล Session หรือ Refresh Token เพื่อให้ระบบสามารถจดจำสถานะการล็อกอินของผู้ใช้ได้อย่างมีประสิทธิภาพและรวดเร็ว ช่วยให้ผู้ใช้ไม่ต้องล็อกอินซ้ำเป็นครั้งที่ 2 |
+| University API | ระบบ API กลางของมหาวิทยาลัยสำหรับดึงข้อมูลเกรดของนักศึกษาและข้อมูลปฏิทินการศึกษาล่าสุดเพื่อนำมาแสดงผลใน Web App |
 
 
 ---
@@ -124,11 +125,6 @@ TODO:
 # 7. User Flow
 
 TODO:
-
-อธิบาย User Flow แบบสั้น ๆ
-
-ตัวอย่าง:
-
 ```text
 User
   ↓
@@ -160,13 +156,13 @@ TODO:(File Name)
 
 **Technology:**
 
-TODO:
+TODO:JavaScript
 
 * เช่น HTML / CSS / JavaScript / React / อื่น ๆ
 
 **UI Framework / Library:**
 
-TODO:
+TODO:Tailwind CSS
 
 ---
 
@@ -174,13 +170,13 @@ TODO:
 
 **Programming Language:**
 
-TODO:
+TODO:TypeScript
 
 * เช่น JavaScript / TypeScript / Python
 
 **Framework:**
 
-TODO:
+TODO:FastAPI
 
 * เช่น Express / FastAPI / อื่น ๆ
 
@@ -190,19 +186,17 @@ TODO:
 
 **Authentication Server:**
 
-* [ ] FreeRADIUS
-* [ ] อื่น ๆ: TODO
+* [x] FreeRADIUS
+* [x] Central Auth API
 
 **Authentication Protocol:**
 
-* [ ] RADIUS
-* [ ] อื่น ๆ: TODO
+* [x] RADIUS
 
 **Token / Session:**
 
-* [ ] JWT
-* [ ] Session
-* [ ] อื่น ๆ: TODO
+* [x] JWT
+* [x] Refresh Token
 
 ---
 
@@ -210,12 +204,15 @@ TODO:
 
 **Reverse Proxy:**
 
-* [ ] Nginx
-* [ ] อื่น ๆ: TODO
+* [x] Nginx
 
 **หน้าที่ของ Reverse Proxy:**
 
 TODO:
+- เป็นด่านหน้าคอยรับ HTTP/HTTPS Request จากผู้ใช้ทั้งหมด
+- จัดการเรื่องความปลอดภัยด้าน SSL/TLS Certificate (HTTPS)
+- จัดการ Routing traffic
+- เสิร์ฟไฟล์ Static ของเว็บ Frontend
 
 ---
 
@@ -223,13 +220,11 @@ TODO:
 
 **Container Platform:**
 
-* [ ] Docker
-* [ ] อื่น ๆ: TODO
+* [x] Docker
 
 **Orchestration:**
 
-* [ ] Docker Compose
-* [ ] อื่น ๆ: TODO
+* [x] Docker Compose
 
 ---
 
@@ -239,25 +234,25 @@ TODO:
 
 * [ ] ไม่มี Database
 * [ ] MySQL
-* [ ] PostgreSQL
+* [x] PostgreSQL
 * [ ] MongoDB
-* [ ] อื่น ๆ: TODO
+
 
 **Database ใช้สำหรับ:**
 
 TODO:
+- เก็บข้อมูล "ปฏิทินการศึกษา"
+- เก็บ "Refresh Token" เพื่อตรวจสอบและจดจำสถานะการล็อกอินของผู้ใช้ในระยะยาว
+- เก็บข้อมูลโปรไฟล์ผู้ใช้เบื้องต้น
+- ทำเป็น Cache เก็บข้อมูล "เกรด" ชั่วคราว
 
 ---
 
 ## 8.7 Other Technologies
 
-TODO:
-
-มี Technology อื่นที่ต้องใช้หรือไม่?
-
-* TODO
-* TODO
-* TODO
+* [x] Redis: ใช้สำหรับเก็บ Cache เพื่อให้ดึงข้อมูลปฏิทินการศึกษาได้เร็วขึ้น และใช้จัดการ Blacklist/Whitelist ของ Token
+* [x] Axios: ใช้สำหรับให้ฝั่งเว็บส่ง Request แนบ JWT ไปขอข้อมูลจาก Backend
+* [x] University API: ระบบ API ปลายทางที่ Backend ของเราต้องไปดึงข้อมูลเกรดจริงมาแสดงผล
 
 # 9. Requirements
 
