@@ -805,10 +805,10 @@ Access Granted
 
 **Expected Result:**
 
-* [ ] ทุกขั้นตอนทำงานสำเร็จ
-* [ ] User สามารถเข้า Web Application ได้
-* [ ] Password ไม่ถูกเก็บใน Web Application
-* [ ] JWT สามารถตรวจสอบได้
+* [x] ทุกขั้นตอนทำงานสำเร็จ
+* [x] User สามารถเข้า Web Application ได้
+* [x] Password ไม่ถูกเก็บใน Web Application
+* [x] JWT สามารถตรวจสอบได้
 
 ---
 
