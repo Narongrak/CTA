@@ -1,1 +1,14 @@
+# RADIUS Users according to docs/SPEC.md
+# Format: <username> Cleartext-Password := "<password>"
+
+# Students
+66010001 Cleartext-Password := "password123"
+66010002 Cleartext-Password := "password123"
+65012345678 Cleartext-Password := "password123"
 student66000001 Cleartext-Password := "password1234"
+
+# Teacher
+teacher01 Cleartext-Password := "teacher123"
+
+# Administrator
+admin Cleartext-Password := "admin1234"

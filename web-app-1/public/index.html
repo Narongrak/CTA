@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade - ระบบตรวจสอบผลการเรียนและปฏิทินการศึกษา</title>
+  <meta name="description" content="ระบบตรวจสอบผลการเรียน ปฏิทินการศึกษา และการจัดการเกรดส่วนกลาง พร้อมระบบยืนยันตัวตน SSO ด้วย RADIUS และ JWT">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header class="navbar" id="mainNavbar">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">GRADE</span>
+          <span class="brand-sub">Academic Portal</span>
+        </div>
+      </div>
+
+      <nav class="nav-links" id="navLinks">
+        <button class="nav-btn active" id="tabGradesBtn" onclick="switchView('grades')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span id="gradesNavText">ผลการเรียน</span>
+        </button>
+        <button class="nav-btn" id="tabCalendarBtn" onclick="switchView('calendar')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>ปฏิทินการศึกษา</span>
+        </button>
+        <button class="nav-btn admin-only hidden" id="tabAuditBtn" onclick="switchView('audit')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          <span>Audit Logs</span>
+        </button>
+      </nav>
+
+      <div class="user-profile-section">
+        <div class="session-badge" id="sessionStatusBadge" title="ระบบคงสถานะการล็อกอินอัตโนมัติ (Silent Refresh)">
+          <span class="status-dot"></span>
+          <span class="session-text">SSO Active</span>
+        </div>
+
+        <div class="profile-chip" id="profileChip">
+          <div class="avatar" id="userAvatar">S</div>
+          <div class="user-meta">
+            <span class="user-display-name" id="userDisplayName">กำลังโหลด...</span>
+            <div class="user-role-badge" id="userRoleBadge">Student</div>
+          </div>
+        </div>
+
+        <button class="btn-logout" id="logoutButton" onclick="handleLogout()" title="ออกจากระบบ">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="main-container">
+    
+    <!-- STUDENT VIEW -->
+    <section id="studentView" class="view-section active">
+      <!-- Profile Header Card -->
+      <div class="hero-card">
+        <div class="hero-content">
+          <div class="hero-details">
+            <div class="hero-tag">ข้อมูลนักศึกษา (Student Profile)</div>
+            <h1 class="student-name" id="studentHeroName">Somchai Jaidee</h1>
+            <div class="student-subinfo">
+              <span class="info-item"><strong>รหัสนักศึกษา:</strong> <span id="studentHeroId">66010001</span></span>
+              <span class="dot-separator">•</span>
+              <span class="info-item"><strong>คณะ:</strong> <span id="studentHeroFaculty">วิศวกรรมศาสตร์</span></span>
+              <span class="dot-separator">•</span>
+              <span class="info-item"><strong>สาขาวิชา:</strong> <span id="studentHeroMajor">วิศวกรรมคอมพิวเตอร์</span></span>
+            </div>
+          </div>
+          <div class="academic-status-pill">
+            <span class="pill-dot"></span>
+            <span>สถานภาพ: ปกติ (Normal)</span>
+          </div>
+        </div>
+
+        <!-- Academic Stat Cards -->
+        <div class="stat-grid">
+          <div class="stat-card highlight">
+            <div class="stat-label">เกรดเฉลี่ยสะสม (GPAX)</div>
+            <div class="stat-value" id="cumulativeGpa">3.85</div>
+            <div class="stat-desc" id="gpaStanding">เกียรตินิยมอันดับหนึ่ง</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">หน่วยกิตสะสม (Total Credits)</div>
+            <div class="stat-value" id="totalCredits">21</div>
+            <div class="stat-desc">จากหลักสูตร 138 หน่วยกิต</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">ภาคการศึกษาล่าสุด</div>
+            <div class="stat-value" id="latestSemester">1/2567</div>
+            <div class="stat-desc">สถานะ: ประกาศผลแล้ว</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">เกรดเฉลี่ยเทอมล่าสุด (GPA)</div>
+            <div class="stat-value" id="latestGpa">3.75</div>
+            <div class="stat-desc">ผ่านทุกรายวิชา</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Semester Grades Section -->
+      <div class="content-card">
+        <div class="card-header">
+          <div>
+            <h2 class="section-title">ผลการเรียนรายภาคการศึกษา</h2>
+            <p class="section-sub">รายละเอียดรายวิชา จำนวนหน่วยกิต และระดับผลการเรียน</p>
+          </div>
+          <div class="semester-filter" id="semesterTabs">
+            <!-- Dynamically populated semester buttons -->
+          </div>
+        </div>
+
+        <div id="gradesTableContainer" class="table-container">
+          <!-- Dynamically populated grade tables per semester -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TEACHER VIEW -->
+    <section id="teacherView" class="view-section hidden">
+      <div class="hero-card teacher-theme">
+        <div class="hero-content">
+          <div>
+            <div class="hero-tag teacher">ระบบบันทึกและจัดการเกรด (Teacher Portal)</div>
+            <h1 class="student-name" id="teacherHeroName">Dr. Kittisak Charoenwong</h1>
+            <div class="student-subinfo">
+              <span>อาจารย์ประจำภาควิชาวิศวกรรมคอมพิวเตอร์</span>
+              <span class="dot-separator">•</span>
+              <span>สิทธิ์การใช้งาน: บันทึกและแก้ไขผลการเรียนในรายวิชาที่สอน</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-header">
+          <div>
+            <h2 class="section-title">รายวิชาที่เปิดสอนและรายชื่อนักศึกษา</h2>
+            <p class="section-sub">เลือกรายวิชาเพื่อตรวจสอบและปรับปรุงเกรดของนักศึกษา</p>
+          </div>
+          <div class="teacher-controls">
+            <label for="courseSelector">กรองรายวิชา:</label>
+            <select id="courseSelector" class="dropdown-filter" onchange="filterTeacherGrades()">
+              <option value="ALL">ทุกลายวิชา</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="teacherGradesTable">
+            <thead>
+              <tr>
+                <th>รหัสวิชา</th>
+                <th>ชื่อวิชา</th>
+                <th>รหัสนักศึกษา</th>
+                <th>ชื่อ-นามสกุล</th>
+                <th>ภาคการศึกษา</th>
+                <th>เกรดปัจจุบัน</th>
+                <th>แก้ไขเกรด</th>
+                <th>การทำงาน</th>
+              </tr>
+            </thead>
+            <tbody id="teacherGradesBody">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN VIEW -->
+    <section id="adminView" class="view-section hidden">
+      <div class="hero-card admin-theme">
+        <div class="hero-content">
+          <div>
+            <div class="hero-tag admin">ระบบควบคุมส่วนกลาง (Admin Portal)</div>
+            <h1 class="student-name" id="adminHeroName">System Administrator</h1>
+            <div class="student-subinfo">
+              <span>ผู้ดูแลระบบสารสนเทศและการยืนยันตัวตน SSO</span>
+              <span class="dot-separator">•</span>
+              <span>สิทธิ์การใช้งาน: จัดการปฏิทินการศึกษา, ดู Audit Logs, ควบคุมระบบ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-header">
+          <div>
+            <h2 class="section-title">จัดการข้อมูลปฏิทินการศึกษา (Academic Calendar Management)</h2>
+            <p class="section-sub">เพิ่ม แก้ไข หรือลบกำหนดการและกิจกรรมสำคัญของมหาวิทยาลัย</p>
+          </div>
+          <button class="btn-primary" id="openAddEventModalBtn" onclick="openAddEventModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>เพิ่มกิจกรรมใหม่</span>
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>รหัส</th>
+                <th>ชื่อกิจกรรม</th>
+                <th>หมวดหมู่</th>
+                <th>วันที่เริ่มต้น</th>
+                <th>วันที่สิ้นสุด</th>
+                <th>การจัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="adminCalendarTableBody">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACADEMIC CALENDAR SECTION (Accessible by all roles) -->
+    <section id="calendarView" class="view-section hidden">
+      <div class="content-card">
+        <div class="card-header">
+          <div>
+            <h2 class="section-title">ปฏิทินการศึกษา (Academic Calendar)</h2>
+            <p class="section-sub">กำหนดการสำคัญประจำปีการศึกษาและภาคเรียน</p>
+          </div>
+          <div class="calendar-categories" id="calendarCategories">
+            <button class="filter-chip active" onclick="filterCalendar('ALL')">ทั้งหมด</button>
+            <button class="filter-chip" onclick="filterCalendar('Registration')">ลงทะเบียน</button>
+            <button class="filter-chip" onclick="filterCalendar('Exam')">การสอบ</button>
+            <button class="filter-chip" onclick="filterCalendar('Grade')">ผลการเรียน</button>
+            <button class="filter-chip" onclick="filterCalendar('Academic')">วิชาการ</button>
+          </div>
+        </div>
+
+        <div class="timeline-container" id="calendarTimeline">
+          <!-- Dynamically populated events -->
+        </div>
+      </div>
+    </section>
+
+    <!-- AUDIT LOGS VIEW (Admin only) -->
+    <section id="auditView" class="view-section hidden">
+      <div class="content-card">
+        <div class="card-header">
+          <div>
+            <h2 class="section-title">บันทึกประวัติการทำรายการ (System Audit Logs)</h2>
+            <p class="section-sub">ตรวจสอบการเปลี่ยนแปลงเกรด, การเข้าสู่ระบบ, และการแก้ไขข้อมูลในระบบ</p>
+          </div>
+          <button class="btn-secondary" onclick="loadAuditLogs()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>รีเฟรชประวัติ</span>
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>เวลาที่บันทึก (Timestamp)</th>
+                <th>ผู้ดำเนินการ (Username)</th>
+                <th>รายละเอียดการกระทำ (Action)</th>
+              </tr>
+            </thead>
+            <tbody id="auditLogsTableBody">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal for Adding Calendar Event (Admin) -->
+  <div class="modal-overlay hidden" id="calendarModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">เพิ่มกิจกรรมปฏิทินการศึกษา</h3>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <form id="addEventForm" onsubmit="handleCreateEvent(event)">
+        <div class="form-group">
+          <label for="eventTitle">ชื่อกิจกรรม / กำหนดการ *</label>
+          <input type="text" id="eventTitle" required placeholder="เช่น สัปดาห์สอบปลายภาค">
+        </div>
+        <div class="form-group">
+          <label for="eventCategory">หมวดหมู่</label>
+          <select id="eventCategory">
+            <option value="General">ทั่วไป (General)</option>
+            <option value="Registration">การลงทะเบียน (Registration)</option>
+            <option value="Exam">การสอบ (Exam)</option>
+            <option value="Grade">ผลการเรียน (Grade)</option>
+            <option value="Academic">วิชาการ (Academic)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eventStartDate">วันที่เริ่มต้น *</label>
+            <input type="date" id="eventStartDate" required>
+          </div>
+          <div class="form-group">
+            <label for="eventEndDate">วันที่สิ้นสุด *</label>
+            <input type="date" id="eventEndDate" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="eventDescription">รายละเอียดเพิ่มเติม</label>
+          <textarea id="eventDescription" rows="3" placeholder="ระบุรายละเอียดเพิ่มเติมของกิจกรรม..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeModal()">ยกเลิก</button>
+          <button type="submit" class="btn-primary" id="saveEventBtn">บันทึกกิจกรรม</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

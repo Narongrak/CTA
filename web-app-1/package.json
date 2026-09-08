@@ -1,5 +1,5 @@
 {
-  "name": "web-app-1",
+  "name": "grade-portal-app",
   "version": "1.0.0",
   "private": true,
   "main": "app.js",
@@ -9,6 +9,7 @@
   "dependencies": {
     "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1"
   }
 }

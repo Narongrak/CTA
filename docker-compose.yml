@@ -1,7 +1,24 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sso_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: gradedb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sso_net
+
   freeradius:
     build: ./freeradius
     container_name: sso_radius
+    restart: always
     ports:
       - "1812:1812/udp"
     networks:
@@ -10,6 +27,7 @@ services:
   central-auth:
     build: ./central-auth
     container_name: sso_central_auth
+    restart: always
     environment:
       PORT: 3000
       RADIUS_HOST: freeradius
@@ -17,6 +35,7 @@ services:
       RADIUS_SECRET: testing123
       JWT_SECRET: change-this-jwt-secret
       COOKIE_SECURE: "false"
+      RADIUS_TIMEOUT_MS: 5000
     depends_on:
       - freeradius
     networks:
@@ -25,15 +44,26 @@ services:
   web-app-1:
     build: ./web-app-1
     container_name: sso_web_app_1
+    restart: always
     environment:
       PORT: 3001
       JWT_SECRET: change-this-jwt-secret
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/gradedb
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: gradedb
+    depends_on:
+      - postgres
+      - central-auth
     networks:
       - sso_net
 
   nginx:
     image: nginx:alpine
     container_name: sso_nginx_proxy
+    restart: always
     ports:
       - "80:80"
     volumes:
@@ -43,6 +73,10 @@ services:
       - web-app-1
     networks:
       - sso_net
+
+volumes:
+  postgres_data:
+    driver: local
 
 networks:
   sso_net:
