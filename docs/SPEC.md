@@ -68,50 +68,58 @@ TODO:
 ### Client
 
 TODO:
-- ผู้ใช้สามารถทำอะไรได้บ้าง?
-- Login ผ่านหน้าไหน?
-- ต้องรองรับ Browser อะไรบ้าง?
+- ผู้ใช้สามารถทำอะไรได้บ้าง? : ผู้ใช้สามารถเข้าสู่ระบบผ่าน SSO เพื่อเข้าใช้งานเว็บไซต์ ดูข้อมูลส่วนตัว ดูผลการเรียน ตรวจสอบเกรด และดูปฏิทินการศึกษาได้ โดย Admin สามารถจัดการข้อมูลภายในระบบได้
+
+- Login ผ่านหน้าไหน? : ผู้ใช้ Login ผ่านหน้า Central Authentication Service โดยเมื่อ Login สำเร็จ ระบบจะส่งผู้ใช้กลับไปยัง Web Application ที่ต้องการใช้งาน
+
+- ต้องรองรับ Browser อะไรบ้าง? : รองรับ Browser หลัก เช่น Google Chrome, Microsoft Edge และ Mozilla Firefox
 
 ### Nginx
 
 TODO:
-- ต้องทำหน้าที่อะไร?
-- ต้อง Route URL อะไรบ้าง?
+- ต้องทำหน้าที่อะไร? : ทำหน้าที่เป็น Reverse Proxy รับ Request จากผู้ใช้และส่งต่อไปยัง Service ที่เกี่ยวข้อง เช่น Central Auth Service หรือ Web Application
 
-ตัวอย่าง:
-- `/auth/` → Central Auth
-- `/lab/` → Web App
+- ต้อง Route URL อะไรบ้าง? : /auth/ → Central Authentication Service / SSO API
+/student/ → Student Web Application
+/admin/ → Admin Web Application
 
-ต้องการ URL อื่นหรือไม่:
+ต้องการ URL อื่นหรือไม่: อาจมี /api/ สำหรับใช้เรียก API ของระบบ และ /logout/ สำหรับออกจากระบบ
 
 TODO:
 
 ### Central Authentication Service
 
 TODO:
-- Login ด้วย Username/Password หรือวิธีอื่น?
-- ติดต่อ RADIUS อย่างไร?
-- หลัง Login สำเร็จต้องทำอะไร?
-- หลัง Login ไม่สำเร็จต้องทำอะไร?
-- ต้องสร้าง JWT หรือ Session?
-- JWT ต้องมีข้อมูลอะไรบ้าง?
+- Login ด้วย Username/Password หรือวิธีอื่น? : ใช้ Username และ Password โดยผู้ใช้กรอกข้อมูลผ่านหน้า Login ของระบบ
+
+- ติดต่อ RADIUS อย่างไร? : Central Auth Service จะส่งข้อมูล Username และ Password ไปตรวจสอบกับ FreeRADIUS ผ่าน RADIUS Protocol ถ้าข้อมูลถูกต้องจึงให้ Login ผ่าน
+
+- หลัง Login สำเร็จต้องทำอะไร? : ระบบจะสร้าง JWT ให้ผู้ใช้ แล้วส่งกลับไปยัง Web Application เพื่อให้ผู้ใช้สามารถเข้าใช้งานระบบได้โดยไม่ต้อง Login ใหม่
+
+- หลัง Login ไม่สำเร็จต้องทำอะไร? : ระบบจะแจ้งเตือนว่า Username หรือ Password ไม่ถูกต้อง และให้ผู้ใช้ลอง Login ใหม่
+
+- ต้องสร้าง JWT หรือ Session? : ใช้ JWT เพราะต้องการให้ Central Auth Service สามารถใช้ร่วมกับ Web Application หลายระบบได้
+
+- JWT ต้องมีข้อมูลอะไรบ้าง? : มีข้อมูลที่จำเป็น เช่น User ID, Username, Role และเวลาหมดอายุของ Token
 
 ### RADIUS Server
 
 TODO:
-- ใช้ FreeRADIUS หรือไม่?
-- ใช้ Authentication แบบใด?
-- User ถูกเก็บไว้ที่ไหน?
-- ต้องมี User กี่คนสำหรับ Demo?
-- ต้องรองรับการเพิ่ม User หรือไม่?
+- ใช้ FreeRADIUS หรือไม่? : ใช้ FreeRADIUS ตามเงื่อนไขของโปรเจกต์
+
+- ใช้ Authentication แบบใด?: User สำหรับการ Login จะเก็บไว้ในฐานข้อมูลหรือไฟล์ที่ FreeRADIUS สามารถใช้ตรวจสอบได้ โดยในระบบ Demo สามารถใช้ PostgreSQL เป็นฐานข้อมูลได้
+
+- ต้องมี User กี่คนสำหรับ Demo?: มีประมาณ 3-5 คนก็เพียงพอสำหรับการ Demo เช่น นักศึกษา 3 คน และ Admin 1 คน
+
+- ต้องรองรับการเพิ่ม User หรือไม่? : ควรรองรับ เพื่อให้ Admin สามารถเพิ่มผู้ใช้งานใหม่ได้โดยไม่ต้องแก้ไขระบบโดยตรง
 
 ### Web Application
 
 TODO:
-- Web App มีไว้ทำอะไร?
-- ต้องมี Feature อะไร?
-- ต้องตรวจสอบ JWT อย่างไร?
-- ต้องมี Role/Permission หรือไม่?
+- Web App มีไว้ทำอะไร? : ใช้เป็นเว็บสำหรับทดสอบการทำงานของ Central Auth Service / SSO และเป็นระบบสำหรับให้นักศึกษาดูเกรดและปฏิทินการศึกษา
+- ต้องมี Feature อะไร? : มีหน้า Login, หน้า Dashboard, ดูข้อมูลนักศึกษา, ดูผลการเรียน, ดู GPA, ดูรายวิชา และดูปฏิทินการศึกษา
+- ต้องตรวจสอบ JWT อย่างไร? : ทุกครั้งที่ผู้ใช้เข้าหน้าที่ต้อง Login ระบบจะตรวจสอบ JWT ว่าถูกต้องหรือไม่ หมดอายุหรือยัง และข้อมูลภายใน Token ตรงกับผู้ใช้หรือไม่
+- ต้องมี Role/Permission หรือไม่? : มี โดยแบ่งอย่างน้อยเป็น Student และ Admin เพื่อกำหนดว่าผู้ใช้แต่ละประเภทสามารถเข้าถึงส่วนไหนของระบบได้บ้าง
 
 ---
 
@@ -119,7 +127,7 @@ TODO:
 
 ## 3.1 Login Flow
 
-Expected flow:
+Expected flow: 
 
 1. User เข้า Web Application
 2. Web Application ตรวจสอบ Authentication
@@ -135,11 +143,11 @@ Expected flow:
 12. อนุญาตให้ User เข้าใช้งาน
 
 TODO:
-- Flow ต้องเปลี่ยนจากนี้หรือไม่?
-- ต้องมี Logout หรือไม่?
-- Logout ต้องทำอย่างไร?
-- Token หมดอายุหลังจากกี่นาที/ชั่วโมง?
-- เมื่อ Token หมดอายุให้ทำอะไร?
+- Flow ต้องเปลี่ยนจากนี้หรือไม่? : ไม่ต้องเปลี่ยน เพราะ Flow นี้เหมาะกับระบบที่ใช้ Central Auth และ FreeRADIUS ตามเงื่อนไขของโปรเจกต์
+- ต้องมี Logout หรือไม่? : มีเพื่อให้ผู้ใช้สามารถออกจากระบบได้อย่างปลอดภัย
+- Logout ต้องทำอย่างไร? : เมื่อกด Logout ระบบจะลบ JWT ออกจาก Browser และพาผู้ใช้กลับไปยังหน้า Login
+- Token หมดอายุหลังจากกี่นาที/ชั่วโมง? : กำหนดให้ JWT หมดอายุภายใน 1 ชั่วโมง เพื่อไม่ให้ Token สามารถใช้งานได้นานเกินไป
+- เมื่อ Token หมดอายุให้ทำอะไร? : ระบบจะไม่อนุญาตให้เข้าใช้งานต่อ และ Redirect ผู้ใช้กลับไปที่ Central Auth เพื่อ Login ใหม่
 
 ---
 
@@ -148,26 +156,26 @@ TODO:
 ## 4.1 Username
 
 TODO:
-- รูปแบบ Username:
-- ตัวอย่าง Username:
+- รูปแบบ Username: ใช้รหัสนักศึกษาเป็น Username สำหรับนักศึกษา ส่วน Admin สามารถใช้ชื่อที่กำหนดไว้สำหรับระบบ
+- ตัวอย่าง Username: 65012345678
 
 ## 4.2 Password
 
 TODO:
-- Password มีข้อกำหนดอะไร?
-- Minimum length:
-- ต้องมีตัวเลขหรือไม่?
-- ต้องมีตัวอักษรพิเศษหรือไม่?
+- Password มีข้อกำหนดอะไร? : กำหนดให้ Password มีความยาวอย่างน้อย 8 ตัว และควรมีทั้งตัวอักษรและตัวเลข
+- Minimum length: 8 ตัวอักษร
+- ต้องมีตัวเลขหรือไม่? : ต้องมีอย่างน้อย 1 ตัว
+- ต้องมีตัวอักษรพิเศษหรือไม่? : ไม่บังคับ แต่แนะนำให้มีเพื่อเพิ่มความปลอดภัย
 
 ## 4.3 RADIUS
 
 TODO:
-- RADIUS Host:
-- RADIUS Port:
-- RADIUS Secret:
-- Authentication Method:
-- Timeout:
-- Retry:
+- RADIUS Host: freeradius
+- RADIUS Port: 1812
+- RADIUS Secret: กำหนดเป็น Shared Secret ที่ใช้ร่วมกันระหว่าง Central Auth Service กับ FreeRADIUS เช่น radius_shared_secret
+- Authentication Method: ใช้ RADIUS Authentication แบบ PAP สำหรับระบบ Demo
+- Timeout: 5 วินาที
+- Retry: ลองเชื่อมต่อใหม่ไม่เกิน 3 ครั้ง
 
 ---
 
