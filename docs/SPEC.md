@@ -176,7 +176,9 @@ TODO:
 ## 5.1 Token Type
 
 TODO:
-- JWT / Session / อื่น ๆ:
+- Access Token: ใช้ JWT (JSON Web Token) แบบอายุสั้น (เช่น 15 นาที - 1 ชั่วโมง) สำหรับส่งไปกับ HTTP Header (Authorization: Bearer <token>) เพื่อใช้สิทธิ์เข้าดูเกรดและปฏิทิน
+
+- Refresh Token: ใช้เป็น Opaque Token (สตริงสุ่มความปลอดภัยสูง) หรือ JWT อายุยาว (เช่น 30 วัน) เก็บไว้ใน HTTP-Only Cookie เพื่อใช้สำหรับขอ Access Token ใหม่เมื่อ Token เดิมหมดอายุ (กลไกหลักที่ทำให้ไม่ต้องล็อกอินซ้ำ)
 
 ## 5.2 JWT Payload
 
@@ -184,8 +186,13 @@ TODO:
 
 ```json
 {
-  "sub": "username",
-  "role": "student"
+  "iss": "central-auth-service",
+  "sub": "6601xxxx",
+  "name": "Somchai Jaidee",
+  "role": "student",
+  "faculty": "Engineering",
+  "iat": 1715000000,
+  "exp": 1715003600
 }
 ```
 
@@ -196,32 +203,11 @@ TODO:
 ## 6.1 Roles Require
 
 TODO:
-ระบบมี Role อะไรบ้าง?
-
-ตัวอย่าง:
-
-Student
-Teacher
-Admin
-
-รายการ Role จริง:
-
-TODO:
+Student (นักศึกษา): ผู้ใช้งานหลักของระบบที่เข้ามาดูเกรดของตนเอง
+Teacher (อาจารย์): ผู้ใช้งานที่เกี่ยวข้องกับการบันทึกหรือจัดการผลการเรียนของนักศึกษา
+Admin (ผู้ดูแลระบบ / เจ้าหน้าที่ทะเบียน): ผู้ดูแลระบบส่วนกลาง จัดการฐานข้อมูล และควบคุมข้อมูลปฏิทินการศึกษา
 
 ## 6.2 Roles Permission
-
-TODO:
-แต่ละ Roles ทำอะไรได้บ้าง
-
-ตัวอย่าง:
-
-| Role    | Permission     |
-| ------- | -------------- |
-| Student | View / Reserve |
-| Teacher | View / Manage  |
-| Admin   | Full Access    |
-
-แก้ไขตามระบบจริง:
 
 TODO:
 
