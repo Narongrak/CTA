@@ -265,27 +265,27 @@ TODO:
 **FR-01 — User Login**
 
 TODO:
-ผู้ใช้ต้องสามารถ...
+ผู้ใช้ต้องสามารถกรอก Username และ Password ผ่านหน้า Login ของระบบเพื่อยืนยันตัวตนได้
 
 **FR-02 — RADIUS Authentication**
 
 TODO:
-Central Auth ต้อง...
+Central Auth ต้องนำ Username และ Password ที่ผู้ใช้กรอก ไปตรวจสอบความถูกต้องกับฐานข้อมูลผู้ใช้ของสถาบันผ่านโปรโตคอล RADIUS
 
 **FR-03 — JWT / Session**
 
 TODO:
-หลังจาก Login สำเร็จ ระบบต้อง...
+หลังจาก Login สำเร็จ ระบบต้องสร้าง Access JWT และ Refresh Token และส่งกลับไปให้เบราว์เซอร์เก็บไว้
 
 **FR-04 — Redirect**
 
 TODO:
-หลังจาก Authentication สำเร็จ ระบบต้อง...
+หลังจาก Authentication สำเร็จ ระบบต้อง Redirect ผู้ใช้ไปยังหน้า Dashboard หลัก เพื่อดูเกรดและปฏิทินการศึกษา
 
 **FR-05 — Logout**
 
 TODO:
-ผู้ใช้สามารถ...
+ผู้ใช้สามารถกดปุ่ม Logout เพื่อออกจากระบบ โดยระบบจะต้องทำการลบ JWT และระงับ Refresh Token ออกจากฐานข้อมูล เพื่อไม่ให้ถูกนำมาใช้ซ้ำได้
 
 ---
 
@@ -294,14 +294,17 @@ TODO:
 **FR-06 — Web Application Access**
 
 TODO:
+ระบบต้องสามารถแสดงผล เกรด (Grades) ของนักศึกษาแต่ละคน และ ปฏิทินการศึกษา (Academic Calendar) ได้อย่างถูกต้องและเป็นระเบียบ
 
 **FR-07 — Protected Resource**
 
 TODO:
+ข้อมูลเกรดถือเป็นข้อมูลส่วนบุคคล ระบบต้องอนุญาตให้เข้าถึงได้เฉพาะผู้ใช้ที่มี Access JWT ที่ถูกต้องเท่านั้น หากไม่มี Token ระบบต้องปฏิเสธการเข้าถึง
 
 **FR-08 — User Information**
 
 TODO:
+ระบบต้องดึงข้อมูลเบื้องต้นของผู้ใช้งานจาก Token หรือ Database มาแสดงผลที่แถบเมนูได้
 
 ---
 
@@ -313,15 +316,19 @@ TODO:
 
 ระบบต้องรองรับ Role:
 
-* TODO
-* TODO
-* TODO
+* Student: นักศึกษาทั่วไปที่เข้ามาดูเกรดและปฏิทิน
+* Teacher: สามารถใส่เกรดหรือข้อมูลได้เเค่ในวิชาที่ตัวเองรับผิดชอบ
+* Admin: เจ้าหน้าที่หรือผู้ดูแลระบบที่เข้ามาจัดการข้อมูลส่วนกลาง
 
 **FR-10 — Permission**
 
 TODO:
 
 แต่ละ Role สามารถทำอะไรได้บ้าง?
+
+Student: ดูเกรดของตนเองได้เท่านั้น, ดูปฏิทินการศึกษาได้
+Teacher: สามารถใส่เกรด, ข้อมูลได้เเค่ในวิชาที่ตัวเองรับผิดชอบ, สามารถดูเกรดของนักศึกษาได้
+Admin: ไม่สามารถดูเกรดผู้อื่นได้ (เว้นแต่ได้รับสิทธิ์พิเศษ), สามารถเพิ่ม/ลบ/แก้ไขข้อมูลปฏิทินการศึกษาใน Database ได้
 
 ---
 
@@ -334,13 +341,15 @@ TODO:
 Nginx ต้อง Route:
 
 ```text
-/auth/ → TODO
-/lab/  → TODO
+/auth/ → Central Auth Service
+/api/  → Web App Backend
+/      → Frontend Web Application
 ```
 
 **FR-12 — Request Handling**
 
 TODO:
+Nginx ต้องรองรับการเชื่อมต่อแบบ HTTPS และคอย Forward Header ที่สำคัญไปยัง Backend ได้อย่างถูกต้อง
 
 ---
 
@@ -349,14 +358,17 @@ TODO:
 **FR-13 — Authentication Error**
 
 TODO:
+หากผู้ใช้กรอกรหัสผ่านผิด ระบบต้องแสดงข้อความแจ้งเตือนที่ชัดเจนโดยไม่แจ้งรายละเอียดทางเทคนิคเพื่อป้องกันความปลอดภัย
 
 **FR-14 — RADIUS Error**
 
 TODO:
+หากการเชื่อมต่อระหว่าง Central Auth กับ RADIUS ล้มเหลวหรือ Timeout ระบบต้องแสดงข้อความแจ้งเตือน
 
 **FR-15 — Invalid Token**
 
 TODO:
+หาก Access JWT หมดอายุ ระบบต้องทำการร้องขอ Token ใหม่ผ่าน Refresh Token เบื้องหลัง เพื่อให้ผู้ใช้ไม่ต้องล็อกอินใหม่ แต่ถ้า Refresh Token หมดอายุหรือถูกยกเลิกด้วย ระบบถึงจะบังคับ Redirect กลับไปหน้า Login
 
 ---
 
@@ -369,23 +381,20 @@ TODO:
 **NFR-01**
 
 TODO:
+Password ต้องไม่ถูกเก็บใน Web Application และ Database ของระบบเราโดยเด็ดขาด รหัสผ่านต้องถูกส่งไปตรวจสอบที่ RADIUS และลบทิ้งจากหน่วยความจำทันที
 
-ตัวอย่าง:
-Password ต้องไม่ถูกเก็บใน Web Application
 
 **NFR-02**
 
 TODO:
+JWT ต้องมี Signature ควบคุมความถูกต้องและต้องมีการตั้ง Expiration Time เสมอ เพื่อป้องกันการขโมย Token
 
-ตัวอย่าง:
-JWT ต้องมี Signature และ Expiration
 
 **NFR-03**
 
 TODO:
+Authentication ต้องดำเนินการผ่าน Central Auth เท่านั้น Web App ห้ามมีช่องทาง Login หรือตรวจสอบผู้ใช้ด้วยตนเอง
 
-ตัวอย่าง:
-Authentication ต้องดำเนินการผ่าน Central Auth
 
 ---
 
@@ -394,16 +403,14 @@ Authentication ต้องดำเนินการผ่าน Central Auth
 **NFR-04**
 
 TODO:
-
-ระบบควรตอบสนองภายใน:
+500 ms สำหรับการเปิดหน้าเว็บทั่วไป และดึงข้อมูลปฏิทินการศึกษา
 
 `TODO ms`
 
 **NFR-05**
 
 TODO:
-
-ระบบต้องรองรับผู้ใช้พร้อมกัน:
+500 - 1,000 users โดยระบบต้องไม่ล่ม
 
 `TODO users`
 
@@ -414,8 +421,7 @@ TODO:
 **NFR-06**
 
 TODO:
-
-ระบบต้องสามารถทำงานต่อเนื่อง / Restart ได้อย่างไร?
+ใช้ Docker Compose ในการรัน Service ทั้งหมด และต้องกำหนดนโยบาย restart: always เพื่อให้ Container สามารถเปิดตัวเองขึ้นมาใหม่ได้ทันทีในกรณีที่ระบบล่ม หรือเซิร์ฟเวอร์หลักมีการรีสตาร์ท
 
 ---
 
@@ -424,27 +430,22 @@ TODO:
 **NFR-07**
 
 TODO:
+[x] เพิ่ม Web Application ได้ง่าย
+[x] เพิ่ม User ได้ง่าย
+[x] เพิ่ม Role ได้ง่าย
+[x] เปลี่ยน Configuration ได้ง่าย
+[x] ง่ายต่อการจัดการข้อมูลปฏิทินการศึกษา ด้วยโครงสร้าง Database แบบ Relational
 
-ต้องการให้ระบบสามารถ:
-
-* [ ] เพิ่ม Web Application ได้ง่าย
-* [ ] เพิ่ม User ได้ง่าย
-* [ ] เพิ่ม Role ได้ง่าย
-* [ ] เปลี่ยน Configuration ได้ง่าย
-* [ ] อื่น ๆ: TODO
 
 # 10. Expected Result
 
-เมื่อ Project เสร็จสมบูรณ์ ระบบควรสามารถทำงานตาม Flow ต่อไปนี้:
-
-```text
 User
   ↓
 Web Application
   ↓
 Check Authentication
   ↓
-Not Authenticated
+Not Authenticated / Token Expired
   ↓
 Central Authentication Service
   ↓
@@ -454,62 +455,47 @@ RADIUS Server
   ↓
 Authentication Result
   ↓
-JWT / Session
+JWT
   ↓
 Web Application
   ↓
 Verify Authentication
   ↓
 Access Granted
-```
 
 ## 10.1 Login Success
 
-เมื่อ User Login ด้วยข้อมูลที่ถูกต้อง:
-
 TODO:
+1. User กรอก Username / Password ผ่านหน้าเว็บ
+2. Central Auth รับข้อมูลและส่งไปตรวจสอบที่ RADIUS Server
+3. RADIUS ตรวจสอบสำเร็จและส่งสัญญาณ 'Access-Accept' กลับมา
+4. Central Auth สร้าง Access JWT และ Refresh Token
+5. User ถูก Redirect กลับมาที่หน้า Web Application
+6. Web Application รับ Token มาบันทึกไว้ในระบบและตรวจสอบความถูกต้อง
+7. User สามารถเข้าดูเกรดและปฏิทินการศึกษาได้ และเมื่อปิดเว็บแล้วกลับมาใหม่ ระบบจะดึงข้อมูลมาแสดงได้ทันทีโดยไม่ต้องให้ผู้ใช้ล็อกอินซ้ำอีก
 
-ตัวอย่าง:
-
-1. User กรอก Username / Password
-2. Central Auth ส่งข้อมูลไป RADIUS
-3. RADIUS ส่ง `Access-Accept`
-4. Central Auth สร้าง JWT
-5. User ถูก Redirect กลับ Web Application
-6. Web Application ตรวจสอบ JWT
-7. User สามารถเข้าใช้งานระบบได้
-
----
 
 ## 10.2 Login Failure
 
-เมื่อ User Login ด้วยข้อมูลที่ไม่ถูกต้อง:
 
 TODO:
+1. User กรอก Username / Password ผ่านหน้าเว็บ
+2. Central Auth รับข้อมูลและส่งไปตรวจสอบที่ RADIUS Server
+3. RADIUS พบว่ารหัสผ่านไม่ตรง จึงส่งสัญญาณ Access-Reject กลับมา
+4. Central Auth ระงับการสร้าง Token ทั้งหมด
+5. ระบบแสดงข้อความแจ้งเตือนแก่ผู้ใช้
+6. User ไม่สามารถเข้าถึง Protected Resource ได้ และยังคงอยู่ที่หน้า Login
 
-ตัวอย่าง:
-
-1. User กรอก Username / Password
-2. Central Auth ส่งข้อมูลไป RADIUS
-3. RADIUS ส่ง `Access-Reject`
-4. Central Auth ไม่สร้าง JWT
-5. User ไม่สามารถเข้า Protected Resource ได้
 
 ---
 
 ## 10.3 Unauthorized Access
 
-กรณี User ไม่มี Authentication หรือ JWT ไม่ถูกต้อง:
-
 TODO:
-
-ระบบควร:
-
-* [ ] Redirect ไป Login
-* [ ] แสดง `401 Unauthorized`
-* [ ] แสดง Error Page
-* [ ] อื่น ๆ: TODO
-
+[x] Redirect ไป Login
+[x] แสดง 401 Unauthorized
+[ ] แสดง Error Page
+[x] หาก Access JWT หมดอายุ แต่ระบบพบว่ามี Refresh Token ที่ยังใช้งานได้อยู่ ระบบจะทำงานเบื้องหลัง เพื่อขอ Access JWT ใหม่โดยอัตโนมัติ เพื่อให้ผู้ใช้งานยังคงดูข้อมูลได้โดยไม่รู้สึกสะดุดและไม่ต้องล็อกอินใหม่
 ---
 
 ## 10.4 Expected System State
@@ -518,19 +504,18 @@ TODO:
 
 **Services ที่ต้องทำงาน:**
 
-* [ ] Nginx
-* [ ] Central Auth
-* [ ] FreeRADIUS
-* [ ] Web App
-* [ ] Database
-* [ ] TODO
-
+[x] Nginx
+[x] Central Auth
+[x] FreeRADIUS
+[x] Web App
+[x] Database
+[x] Redis
 **Expected URL:**
 
 ```text
-http://localhost/        → TODO
-http://localhost/auth/   → TODO
-http://localhost/lab/    → TODO
+http://localhost/        → หน้า Dashboard ของ Web App (ดูเกรด / ปฏิทิน หากยังไม่ล็อกอินจะถูกพาไปหน้า auth)
+http://localhost/auth/   → หน้า Central Auth สำหรับจัดการการ Login และออก Token
+http://localhost/api/    → Web App Backend (API หลักที่ให้สิทธิ์ดึงข้อมูลเกรดและปฏิทิน)
 ```
 
 ---
@@ -539,17 +524,17 @@ http://localhost/lab/    → TODO
 
 Project ถือว่าสำเร็จเมื่อ:
 
-* [ ] Docker Compose สามารถ Start ทุก Service
-* [ ] Nginx สามารถ Route Request
-* [ ] User สามารถ Login
-* [ ] Central Auth สามารถติดต่อ RADIUS
-* [ ] RADIUS สามารถตรวจสอบ User
-* [ ] Login สำเร็จได้รับ JWT / Session
-* [ ] Web Application สามารถตรวจสอบ JWT / Session
-* [ ] User ที่ไม่ได้ Authentication ไม่สามารถเข้า Protected Resource
-* [ ] Logout สามารถทำงานได้
-* [ ] TODO
-* [ ] TODO
+* [x] Docker Compose สามารถ Start ทุก Service ได้โดยไม่พบ Error
+* [x] Nginx สามารถ Route Request ไปยัง Service ต่างๆ ได้อย่างถูกต้อง
+* [x] User สามารถ Login ผ่านหน้าต่างของ Central Auth ได้
+* [x] Central Auth สามารถติดต่อ RADIUS ได้อย่างสมบูรณ์
+* [x] RADIUS สามารถตรวจสอบ User และ Password จากฐานข้อมูลจำลองได้
+* [x] Login สำเร็จได้รับ Access JWT และ Refresh Token กลับมาที่เบราว์เซอร์
+* [x] Web Application สามารถตรวจสอบ JWT เพื่อเข้าถึงข้อมูลได้
+* [x] User ที่ไม่ได้ Authentication ไม่สามารถแอบเข้าหน้าดูเกรดได้
+* [x] Logout สามารถทำงานได้ (ลบและทำลาย Token ทั้งหมด)
+* [x] ระบบสามารถจดจำการล็อกอิน (Remember Me) ได้ ผู้ใช้ปิดเบราว์เซอร์แล้วเปิดใหม่ สามารถเข้าหน้าดูเกรดได้เลยโดยไม่ต้องล็อกอินครั้งที่ 2
+* [x] Web Application สามารถดึงและแสดงผล "ข้อมูลเกรด" และ "ปฏิทินการศึกษา" ได้อย่างถูกต้องและสวยงาม
 
 # 11. Limitations
 
@@ -558,38 +543,28 @@ Project ถือว่าสำเร็จเมื่อ:
 ## 11.1 Technical Limitations
 
 TODO:
-
-ตัวอย่าง:
-
-* ระบบทำงานภายใน Local Network
-* ยังไม่ได้ Deploy บน Production Server
-* ใช้ HTTP แทน HTTPS ใน Development
-* RADIUS User ใช้ข้อมูลสำหรับ Demo
+* ระบบทำงานภายใน Local Network และ Container บนเครื่องสำหรับการพัฒนา
+* ยังไม่ได้ Deploy ขึ้นระบบ Production Server จริงของมหาวิทยาลัย
+* การรันบน Development Environment ยังใช้โปรโตคอล HTTP แทน HTTPS
+* ข้อมูลนักศึกษา ข้อมูลเกรดใน Database และบัญชีผู้ใช้ใน RADIUS เป็นเพียงข้อมูลจำลองสำหรับใช้ในการทดสอบระบบเท่านั้น
 
 ---
 
 ## 11.2 Authentication Limitations
 
 TODO:
-
-ตัวอย่าง:
-
-* รองรับเฉพาะ Username / Password
-* ยังไม่มี Multi-Factor Authentication (MFA)
-* ยังไม่มี Password Reset
-* ยังไม่มี Account Recovery
+* รองรับการยืนยันตัวตนผ่าน Username / Password ตามมาตรฐาน RADIUS เท่านั้น
+* ยังไม่มีระบบ Multi-Factor Authentication (MFA) เช่น OTP หรือ Authenticator App
+* ไม่มีระบบ Password Reset / Account Recovery ภายในเว็บนี้
 
 ---
 
 ## 11.3 Application Limitations
 
 TODO:
-
-ตัวอย่าง:
-
-* มี Web Application เพียง 1 ระบบ
-* Feature ของ Web Application จำกัดเฉพาะการทดสอบ SSO
-* ยังไม่มีระบบจัดการ User ผ่านหน้าเว็บ
+* ฟีเจอร์หลักเน้นไปที่การ "ดูเกรด" และ "ดูปฏิทินการศึกษา" เท่านั้น
+* ไม่สามารถใช้ระบบนี้ในการลงทะเบียนเรียน เพิ่ม-ถอนรายวิชา หรือชำระค่าธรรมเนียมการศึกษาได้
+* ระบบหลังบ้านสำหรับจัดการข้อมูลปฏิทินการศึกษายังมีฟังก์ชันพื้นฐานที่จำกัด
 
 ---
 
@@ -598,30 +573,23 @@ TODO:
 **มี Database หรือไม่:**
 
 * [ ] ไม่มี
-* [ ] มี
+* [x] มี
 
 ถ้ามี:
 
 TODO:
-ระบุข้อจำกัด เช่น
-
-* ยังไม่มี Backup
-* ยังไม่มี Database Replication
-* ใช้ Database สำหรับ Development เท่านั้น
-
+* ระบบ Database ยังเป็นแบบ Single Node ไม่มี Database Replication
+* ยังไม่มีระบบ Automated Backup สำหรับสำรองข้อมูล
+* Database ในเวอร์ชันนี้ตั้งค่าทรัพยากรไว้สำหรับ Development เท่านั้น หากนำไปใช้บน Production ต้องปรับจูน (Tuning) เพิ่มเติม
 ---
 
 ## 11.5 Security Limitations
 
 TODO:
-
-ตัวอย่าง:
-
-* Development Environment ใช้ HTTP
-* Secret ถูกกำหนดผ่าน Environment Variable
-* ยังไม่มีระบบ Security Monitoring
-* ยังไม่มี Rate Limiting
-* ยังไม่มี MFA
+* Development Environment ใช้ HTTP ซึ่งอาจเสี่ยงต่อการถูกดักจับข้อมูล (Packet Sniffing) หากนำไปเปิด Public โดยไม่ใส่ Nginx SSL
+* คีย์สำคัญ (Secret Keys, JWT Secret, DB Password) ถูกกำหนดผ่านไฟล์ Environment Variable (.env) แบบ Plain text (ยังไม่ได้ใช้ Key Vault หรือ Secret Manager)
+* ยังไม่มีระบบ Security Monitoring หรือ Alert เมื่อมีการพยายามล็อกอินผิดพลาดซ้ำๆ
+* ยังไม่มีระบบ Rate Limiting ที่เข้มงวดเพื่อป้องกันการโจมตีแบบ Brute-force เต็มรูปแบบ
 
 ---
 
@@ -631,32 +599,29 @@ TODO:
 
 ระบบปัจจุบันสามารถ Deploy ได้ที่:
 
-* [ ] Local Machine
-* [ ] VM
-* [ ] Local Network
+* [x] Local Machine
+* [x] VM
+* [x] Local Network
 * [ ] Cloud
-* [ ] อื่น ๆ: TODO
 
 ข้อจำกัด:
 
 TODO:
+การ Deploy ปัจจุบันผูกกับโครงสร้างของ Docker Compose เป็นหลัก ยังไม่ได้ปรับแพ็กเกจสำหรับการ Deploy ลงบน Kubernetes (K8s) หรือระบบ Cloud Orchestration ขนาดใหญ่
 
 ---
 
 ## 11.7 Known Issues
 
-ปัญหาที่ทราบใน Version ปัจจุบัน:
-
-* TODO
-* TODO
-* TODO
-
+* กลไก Silent Refresh (ขอ Token ใหม่เบื้องหลัง) อาจทำงานผิดพลาดหากอินเทอร์เน็ตของผู้ใช้มี Latency สูงมากหรือขาดช่วงพอดี ทำให้ผู้ใช้อาจถูกเด้งกลับไปหน้าล็อกอิน
+* หากผู้ใช้ไม่ได้เข้าใช้งานระบบนานเกินระยะเวลาหมดอายุของ Refresh Token (เช่น เกิน 30 วัน) ระบบจะไม่สามารถจดจำการล็อกอินได้ และผู้ใช้จำเป็นต้องล็อกอินใหม่ตามนโยบายความปลอดภัย
 ---
 
 ## 11.8 Out of Scope
 
 สิ่งที่ **ไม่อยู่ในขอบเขตของ Project นี้**:
 
-* TODO
-* TODO
-* TODO
+* ระบบลงทะเบียนเรียน และการจัดตารางสอน
+* ระบบชำระเงินค่าธรรมเนียมการศึกษา
+* ระบบขอเอกสารสำคัญทางการศึกษา เช่น การพิมพ์ทรานสคริปต์ฉบับจริง ที่มีลายเซ็นดิจิทัล
+* การจัดการเปลี่ยนรหัสผ่านนักศึกษา
