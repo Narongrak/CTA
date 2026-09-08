@@ -11,7 +11,7 @@
 ## 1.1 Project Name
 
 TODO:
-- ชื่อโปรเจกต์ที่ต้องการใช้: 
+- ชื่อโปรเจกต์ที่ต้องการใช้: Grade
 
 ---
 
@@ -22,7 +22,7 @@ TODO:
 
 - ต้องการให้ผู้ใช้สามารถทำอะไรได้? : ผู้ใช้สามารถเข้าสู่ระบบ ดูเกรดและตรวจสอบปฏิทินการศึกษาได้
 
-- เป้าหมายหลักของระบบคืออะไร?: ต้องการสร้างเว็บไซต์ที่ช่วยให้นักศึกษาดูข้อมูลเกี่ยวกับการเรียนของตัวเองได้ง่าย สะดวก และรวดเร็วมากขึ้น
+- เป้าหมายหลักของระบบคืออะไร?: ต้องการสร้างเว็บไซต์ที่ช่วยให้นักศึกษาดูเกรดการเรียนของตัวเองได้ง่าย สะดวก และรวดเร็วมากขึ้น โดยมีระบบจดจำการล็อกอินเพื่ออำนวยความสะดวกให้ผู้ใช้ไม่ต้องล็อกอินซ้ำบ่อยๆ
 
 ---
 
@@ -229,15 +229,11 @@ TODO:
 
 ## 7.1 Database Require
 
-ใช้อะไรทำ Database:
-
-TODO:
+ใช้อะไรทำ Database: ใช้ PostgreSQL และรันผ่าน Docker (สามารถใช้ Redis ร่วมด้วยสำหรับการทำ Caching เกรดและ Session)
 
 ## 7.2 Database Purpose
 
-ใช้เก็บอะไรใน Database:
-
-TODO:
+ใช้เก็บอะไรใน Database: ใช้เก็บข้อมูลผู้ใช้งานเบื้องต้น (ไม่ต้องเก็บรหัสผ่าน), ข้อมูลประวัตินักศึกษา, ข้อมูลเกรดรายวิชา, ข้อมูลปฏิทินการศึกษา, ข้อมูลการทำรายการ (Logs) และ เก็บข้อมูล Refresh Token เพื่อใช้จดจำสถานะการล็อกอินของผู้ใช้
 
 ## 7.3 Database Table
 
@@ -253,13 +249,57 @@ TODO:
 
 เพิ่ม Table:
 
-TODO:
+TODO: users
 
-| Column   | Type    | Description |
-| -------- | ------- | ----------- |
-| id       | INT     | User ID     |
-| username | VARCHAR | Username    |
-| role     | VARCHAR | User Role   |
+| Column   | Type    | Description     |
+| -------- | ------- | --------------- |
+| id       | INT     | รหัสผู้ใช้ (Primary Key) |
+| username | VARCHAR | ชื่อผู้ใช้      |
+| password | VARCHAR | รหัสผ่าน        |
+| role     | VARCHAR | สิทธิ์ของผู้ใช้ |
+
+TODO: students
+
+| Column     | Type    | Description        |
+| ---------- | ------- | ------------------ |
+| id         | INT     | รหัสข้อมูลนักศึกษา (Primary Key) |
+| student_id | VARCHAR | รหัสนักศึกษา       |
+| name       | VARCHAR | ชื่อ-นามสกุล       |
+| email      | VARCHAR | อีเมล              |
+| major      | VARCHAR | สาขาวิชา           |
+
+TODO: grades
+
+| Column     | Type    | Description  |
+| ---------- | ------- | ------------ |
+| id         | INT     | รหัสเกรด (Primary Key) |
+| student_id | INT     | รหัสนักศึกษา (Foreign Key) |
+| subject_id | INT     | รหัสวิชา     |
+| semester   | VARCHAR | ภาคการศึกษา  |
+| grade      | VARCHAR | เกรด         |
+
+TODO: academic_calendar
+
+| Column      | Type    | Description   |
+| ----------- | ------- | ------------- |
+| id          | INT     | รหัสกิจกรรม (Primary Key) |
+| title       | VARCHAR | ชื่อกิจกรรม   |
+| description | TEXT    | รายละเอียด    |
+| start_date  | DATE    | วันที่เริ่ม   |
+| end_date    | DATE    | วันที่สิ้นสุด |
+
+TODO: audit_logs
+
+| Column     | Type      | Description                 |
+| ---------- | --------- | --------------------------- |
+| id         | INT       | รหัส Log (Primary Key) |
+| user_id    | INT       | รหัสผู้ใช้ (Foreign Key) |
+| action     | VARCHAR   | การกระทำ เช่น Login, Logout |
+| created_at | TIMESTAMP | วันและเวลาที่ทำรายการ       |
+
+
+
+TODO
 
 # 8 Error Handling
 
@@ -267,29 +307,31 @@ TODO:
 
 กรณีต่าง ๆ ต้องแสดงผลอย่างไร?
 
-Invalid Username / Password
+Invalid Username / Password 
 
-TODO:
+TODO: Action: แสดงข้อความว่า “รหัสผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง” และให้ผู้ใช้ลอง Login ใหม่ (เพื่อความปลอดภัย จะไม่บอกเจาะจงว่าผิดที่ Username หรือ Password)
 
 RADIUS Server Down
 
-TODO:
+TODO: Action: แสดงข้อความว่า “ไม่สามารถเชื่อมต่อระบบตรวจสอบสิทธิ์ของมหาวิทยาลัยได้ กรุณาลองใหม่ภายหลัง” และไม่อนุญาตให้ Login
 
 RADIUS Timeout
 
-TODO:
+TODO: Action: เมื่อรอเกินเวลาที่กำหนด (เช่น 5 วินาที) ระบบจะตัดการเชื่อมต่อและแสดงข้อความว่า “ระบบใช้เวลาตอบกลับนานเกินไป กรุณาลองใหม่อีกครั้ง”
 
 Invalid JWT
 
-TODO:
+TODO: Action: ระบบ Frontend จะแสดงข้อความว่า “ข้อมูลเซสชันไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่” นำผู้ใช้กลับไปหน้า Login พร้อมกับลบข้อมูล Token ที่ผิดปกติออกทั้งหมด
 
 Expired JWT
 
-TODO:
+TODO: 
+1. หาก Access Token หมดอายุ แต่ Refresh Token ยังใช้งานได้อยู่: ระบบ Frontend จะส่งคำขอ (Silent Refresh) ไปขอ Access Token ใหม่เบื้องหลังแบบอัตโนมัติ โดยที่ ผู้ใช้ไม่ต้องรู้ตัวและไม่ต้องล็อกอินใหม่
+2. หาก Refresh Token หมดอายุด้วย หรือถูกลบออกจากระบบ: ระบบจะเตะผู้ใช้ออก พร้อมแสดงข้อความว่า “เซสชันของคุณหมดอายุ กรุณาเข้าสู่ระบบใหม่อีกครั้ง” แล้ว Redirect กลับไปยัง Central Auth
 
 Unauthorized User
 
-TODO:
+TODO: Action: แสดงหน้า 403 Forbidden พร้อมข้อความว่า “คุณไม่มีสิทธิ์เข้าถึงหน้านี้” และไม่อนุญาตให้เข้าถึงข้อมูลที่ไม่มีสิทธิ์ (เช่น Student พยายามเข้า URL ของ Admin เพื่อแก้ไขปฏิทิน)
 
 # 9. Testing Requirements
 
@@ -303,16 +345,16 @@ TODO:
 
 **เงื่อนไข:**
 
-* TODO: Username ที่ถูกต้องคือ:
-* TODO: Password ที่ถูกต้องคือ:
+* TODO: Username ที่ถูกต้องคือ: 66010001
+* TODO: Password ที่ถูกต้องคือ: password123
 
 **Expected Result:**
 
-* [ ] Login สำเร็จ
-* [ ] RADIUS ส่ง `Access-Accept`
-* [ ] Central Auth สร้าง JWT
-* [ ] User ถูก Redirect ไปยัง Web Application
-* [ ] Web Application อนุญาตให้เข้าใช้งาน
+* [x] Login สำเร็จ
+* [x] RADIUS ส่ง `Access-Accept`
+* [x] Central Auth สร้าง JWT
+* [x] User ถูก Redirect ไปยัง Web Application
+* [x] Web Application อนุญาตให้เข้าใช้งาน
 
 ---
 
@@ -320,15 +362,15 @@ TODO:
 
 **Input:**
 
-* Username: TODO
-* Password: TODO
+* Username: 99999999
+* Password: password123
 
 **Expected Result:**
 
-* [ ] RADIUS ส่ง `Access-Reject`
-* [ ] Login ไม่สำเร็จ
-* [ ] ไม่สร้าง JWT
-* [ ] User ไม่สามารถเข้า Web Application ได้
+* [x] RADIUS ส่ง `Access-Reject`
+* [x] Login ไม่สำเร็จ
+* [x] ไม่สร้าง JWT
+* [x] User ไม่สามารถเข้า Web Application ได้
 
 ---
 
@@ -336,18 +378,19 @@ TODO:
 
 **Input:**
 
-* Username: TODO
-* Password: TODO
+* Username: 66010001
+* Password: wrongpassword
 
 **Expected Result:**
 
-* [ ] Login ไม่สำเร็จ
-* [ ] ไม่สร้าง JWT
-* [ ] แสดง Error Message
+* [x] Login ไม่สำเร็จ
+* [x] ไม่สร้าง JWT
+* [x] แสดง Error Message
 
 **Error Message ที่ต้องการ:**
 
 TODO:
+"รหัสผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง"
 
 ---
 
@@ -355,12 +398,12 @@ TODO:
 
 **Input:**
 
-* Username: TODO
-* Password: TODO
+* Username: (ปล่อยว่าง)
+* Password: (ปล่อยว่าง)
 
 **Expected Result:**
 
-TODO:
+TODO:ระบบตรวจสอบตั้งแต่ฝั่ง Frontend (Client-side validation) ไม่ส่ง Request ไปยังเซิร์ฟเวอร์ และแสดงข้อความ "กรุณากรอกรหัสผู้ใช้งานและรหัสผ่าน"
 
 ---
 
@@ -370,11 +413,11 @@ TODO:
 
 **Test:**
 
-TODO:
+TODO:สั่งรัน Container FreeRADIUS และทดสอบยิง Request จาก Central Auth
 
 **Expected Result:**
 
-TODO:
+TODO:สามารถเชื่อมต่อผ่านพอร์ต 1812 ได้ และ RADIUS ตอบกลับ Access-Accept หรือ Access-Reject ตามข้อมูลที่ส่งไป
 
 ---
 
@@ -382,18 +425,19 @@ TODO:
 
 **Test:**
 
-TODO:
+TODO:สั่ง Stop Container FreeRADIUS และพยายามล็อกอินหน้าเว็บ
 
 **Expected Result:**
 
-* [ ] Login ไม่สำเร็จ
-* [ ] ระบบแสดง Error
-* [ ] ระบบไม่ค้าง
-* [ ] มี Timeout
+TODO:
+[x] Login ไม่สำเร็จ
+[x] ระบบแสดง Error
+[x] ระบบไม่ค้าง
+[x] มี Timeout
 
 **Error Message:**
 
-TODO:
+TODO:"ระบบตรวจสอบสิทธิ์ของมหาวิทยาลัยขัดข้องชั่วคราว กรุณาลองใหม่อีกครั้ง"
 
 ---
 
@@ -401,11 +445,11 @@ TODO:
 
 **Timeout ที่ต้องการ:**
 
-TODO: ____ seconds
+TODO: 5 seconds
 
 **Expected Result:**
 
-TODO:
+TODO:เมื่อเกิน 5 วินาที Central Auth ต้องยกเลิกการรอ (Abort) และส่ง HTTP 504 Gateway Timeout กลับไปให้ Frontend เพื่อแสดงข้อความแจ้งเตือน
 
 ---
 
@@ -413,11 +457,11 @@ TODO:
 
 **Test:**
 
-TODO:
+TODO:เปลี่ยนค่า RADIUS_SECRET ในไฟล์ .env ของ Central Auth เป็นค่าที่ผิด
 
 **Expected Result:**
 
-TODO:
+TODO:RADIUS Server ปฏิเสธ Request ทันที การล็อกอินล้มเหลว และ Central Auth บันทึก Error Log
 
 ---
 
@@ -427,13 +471,13 @@ TODO:
 
 **Test:**
 
-TODO:
+TODO:นำ Access Token ที่ได้จากการล็อกอินสำเร็จ แนบไปกับ Header
 
 **Expected Result:**
 
-* [ ] Signature ถูกต้อง
-* [ ] Token ยังไม่หมดอายุ
-* [ ] User สามารถเข้า Web Application ได้
+* [x] Signature ถูกต้อง
+* [x] Token ยังไม่หมดอายุ
+* [x] User สามารถเข้า Web Application ได้และได้รับข้อมูลเกรด
 
 ---
 
@@ -441,12 +485,12 @@ TODO:
 
 **Test:**
 
-TODO:
+TODO:พยายามพิมพ์ URL เข้าหน้า /grades โดยตรงผ่านโหมดไม่ระบุตัวตน
 
 **Expected Result:**
 
-* [ ] ไม่อนุญาตให้เข้า Web Application
-* [ ] Redirect ไป Central Auth
+* [x] ไม่อนุญาตให้เข้า Web Application
+* [x] Redirect ไปหน้า Login (Central Auth)
 
 ---
 
@@ -454,11 +498,13 @@ TODO:
 
 **Token Expiration:**
 
-TODO: ____ minutes / hours
+TODO: Access Token 1 hours / Refresh Token 30 days
 
 **Expected Result:**
 
 TODO:
+1. หาก Access Token หมดอายุ แต่ Refresh Token ยังใช้งานได้ -> ระบบดึง Access Token ใหม่มาให้เบื้องหลัง (Silent Refresh) ผู้ใช้ใช้งานต่อได้ทันที
+2. หากหมดอายุทั้งคู่ -> บังคับ Redirect ไปหน้า Login
 
 ---
 
@@ -467,18 +513,15 @@ TODO:
 **Test:**
 
 TODO:
-
-ตัวอย่าง:
-
 ```text
 เปลี่ยน role จาก student → admin
 ```
 
 **Expected Result:**
 
-* [ ] Signature ไม่ถูกต้อง
-* [ ] Token ถูกปฏิเสธ
-* [ ] ไม่อนุญาตให้เข้าใช้งาน
+* [x] Signature ไม่ถูกต้อง (เพราะไม่มี Secret Key ของเซิร์ฟเวอร์)
+* [x] Token ถูกปฏิเสธ (HTTP 401)
+* [x] ไม่อนุญาตให้เข้าใช้งาน
 
 ---
 
@@ -486,11 +529,11 @@ TODO:
 
 **Test:**
 
-TODO:
+TODO:ใช้ Secret Key อื่นจำลองการสร้าง JWT ขึ้นมาเองแล้วส่งเข้าสู่ระบบ
 
 **Expected Result:**
 
-TODO:
+TODO:Backend ตรวจสอบ Signature ไม่ผ่าน ส่งกลับเป็น 401 Unauthorized ทันที
 
 ---
 
@@ -500,12 +543,12 @@ TODO:
 
 **URL:**
 
-TODO:
+TODO:http://localhost/ หรือ http://localhost/grades
 
 **Expected Result:**
 
-* [ ] Redirect ไป Central Auth
-* [ ] ไม่สามารถเข้าหน้า Protected Page ได้
+* [x] Redirect ไป Central Auth (/auth)
+* [x] ไม่สามารถเข้าหน้า Protected Page ได้
 
 ---
 
@@ -513,9 +556,9 @@ TODO:
 
 **Expected Result:**
 
-* [ ] JWT ถูกตรวจสอบ
-* [ ] User สามารถเข้า Web Application
-* [ ] แสดงข้อมูล User
+* [x] JWT ถูกตรวจสอบ
+* [x] User สามารถเข้า Web Application
+* [x] แสดงข้อมูล User
 
 ---
 
@@ -523,16 +566,15 @@ TODO:
 
 **ต้องการ Logout หรือไม่?**
 
-* [ ] Yes
-* [ ] No
+* [x] Yes
 
 **Logout Flow:**
 
-TODO:
+TODO:User กดปุ่ม Logout -> Web App ส่ง Request ไปที่ API /logout -> ระบบทำการเคลียร์ Refresh Token ในฐานข้อมูล/Redis -> ลบ Token ในเบราว์เซอร์ -> Redirect ไปหน้า Login
 
 **Expected Result:**
 
-TODO:
+TODO:ผู้ใช้ไม่สามารถกดปุ่ม "ย้อนกลับ (Back)" บนเบราว์เซอร์เพื่อเข้ามาดูข้อมูลเดิมได้อีก ต้องล็อกอินใหม่เท่านั้น
 
 ---
 
@@ -540,15 +582,15 @@ TODO:
 
 **User Role:**
 
-TODO:
+TODO:Student
 
 **Resource ที่พยายามเข้าถึง:**
 
-TODO:
+TODO:/api/admin/calendar/edit
 
 **Expected Result:**
 
-TODO:
+TODO:เซิร์ฟเวอร์ตรวจสอบพบว่า Role ไม่ใช่ Admin จะปฏิเสธและตอบกลับเป็น HTTP 403 Forbidden
 
 ---
 
@@ -559,6 +601,8 @@ TODO:
 **สามารถทำอะไรได้บ้าง:**
 
 TODO:
+- ดูเกรดและผลการเรียนของตนเอง
+- ดูปฏิทินการศึกษา
 
 ---
 
@@ -567,6 +611,8 @@ TODO:
 **สามารถทำอะไรได้บ้าง:**
 
 TODO:
+- ดูปฏิทินการศึกษา
+- จัดการบันทึกหรือแก้ไขเกรดของนักศึกษาในรายวิชาที่สอน
 
 ---
 
@@ -575,6 +621,9 @@ TODO:
 **สามารถทำอะไรได้บ้าง:**
 
 TODO:
+- จัดการ (เพิ่ม/ลบ/แก้ไข) ข้อมูลปฏิทินการศึกษาในระบบ
+
+- ดูภาพรวมระบบ และจัดการสิทธิ์ของผู้ใช้
 
 ---
 
@@ -582,14 +631,13 @@ TODO:
 
 **Test:**
 
-TODO:
+TODO:นำ Token ของ Student ไปยิง Request API ในส่วนของ Admin
 
 **Expected Result:**
 
-* [ ] HTTP 403
+* [x] HTTP 403
 * [ ] Redirect
-* [ ] แสดงข้อความ Error
-* [ ] อื่น ๆ: TODO
+* [x] แสดงข้อความ Error
 
 ---
 
@@ -599,11 +647,11 @@ TODO:
 
 **Expected Destination:**
 
-TODO:
+TODO:Route ไปยัง Container ของ central-auth
 
 **Expected Result:**
 
-TODO:
+TODO:โหลดหน้าเว็บสำหรับกรอก Username / Password ขึ้นมาได้อย่างถูกต้อง
 
 ---
 
@@ -611,11 +659,11 @@ TODO:
 
 **Expected Destination:**
 
-TODO:
+TODO:Route ไปยัง Container ของ web-app-backend
 
 **Expected Result:**
 
-TODO:
+TODO:สามารถเรียก API ข้อมูลเกรดและปฏิทิน โดยต้องแนบ Header Authorization เข้าไปด้วย
 
 ---
 
@@ -623,11 +671,11 @@ TODO:
 
 **Test URL:**
 
-TODO:
+TODO:http://localhost/random-page
 
 **Expected Result:**
 
-TODO:
+TODO:Nginx หรือ React Router ฝั่ง Frontend รับเรื่องและแสดงหน้า 404 Not Found กลับมา
 
 ---
 
@@ -643,11 +691,19 @@ docker compose up -d --build
 
 **Expected Services:**
 
-* [ ] nginx
-* [ ] central-auth
-* [ ] freeradius
-* [ ] web-app-1
-* [ ] TODO: เพิ่ม Service
+* [x] nginx
+
+* [x] central-auth
+
+* [x] freeradius
+
+* [x] web-app-frontend
+
+* [x] web-app-backend
+
+* [x] postgres (Database)
+
+* [x] redis (Cache & Session)
 
 ---
 
@@ -661,7 +717,7 @@ docker compose ps
 
 **Expected Result:**
 
-TODO:
+TODO:ทุก Container ต้องมีสถานะเป็น Up (Running) และพอร์ตที่เปิดไว้ (เช่น 80, 443) ต้องถูก Map เข้ากับ Host อย่างถูกต้อง
 
 ---
 
@@ -669,11 +725,11 @@ TODO:
 
 **Test:**
 
-TODO:
+TODO:สั่ง docker compose restart postgres
 
 **Expected Result:**
 
-TODO:
+TODO:Database เริ่มทำงานใหม่ ส่วน Backend (Web App / Central Auth) ต้องสามารถดึง Connection กลับมาเชื่อมต่อใหม่ได้อัตโนมัติเมื่อ Database พร้อม โดยไม่ต้องรีสตาร์ทตัวเอง
 
 ---
 
@@ -681,8 +737,7 @@ TODO:
 
 ### ต้องทดสอบ Database หรือไม่?
 
-* [ ] ไม่มี Database
-* [ ] มี Database
+* [x] มี Database
 
 ถ้ามี:
 
@@ -690,25 +745,25 @@ TODO:
 
 **Expected Result:**
 
-TODO:
+TODO:เมื่อ Backend สตาร์ทขึ้นมา ต้องสามารถ Connect เข้า PostgreSQL และ Redis ได้สำเร็จ ไม่มี Error Connection Refused
 
 ### TC-DB-02: Insert Data
 
 **Expected Result:**
 
-TODO:
+TODO:Admin สามารถเพิ่ม Event ใหม่ลงในตารางปฏิทินการศึกษาได้ และข้อมูลปรากฏในฐานข้อมูลจริง
 
 ### TC-DB-03: Retrieve Data
 
 **Expected Result:**
 
-TODO:
+TODO:Query ดึงข้อมูลเกรดของรหัสนักศึกษา 66010001 ได้ตรงตาม Mock Data ที่เตรียมไว้
 
 ### TC-DB-04: Invalid Data
 
 **Expected Result:**
 
-TODO:
+TODO:หากพยายามบันทึกเกรดที่เป็นตัวอักษรแปลกๆ นอกเหนือจาก (A, B, C, D, F) Database Schema หรือ Backend Validation จะต้องปฏิเสธและคืนค่า 400 Bad Request
 
 ---
 
@@ -763,17 +818,17 @@ Access Granted
 
 | Test Case         | Required | Expected Result |
 | ----------------- | -------- | --------------- |
-| RADIUS Down       | TODO     | TODO            |
-| RADIUS Timeout    | TODO     | TODO            |
-| Invalid Username  | TODO     | TODO            |
-| Invalid Password  | TODO     | TODO            |
-| Invalid JWT       | TODO     | TODO            |
-| Expired JWT       | TODO     | TODO            |
-| Missing JWT       | TODO     | TODO            |
-| Nginx Down        | TODO     | TODO            |
-| Central Auth Down | TODO     | TODO            |
-| Web App Down      | TODO     | TODO            |
-| Database Down     | TODO     | TODO            |
+| RADIUS Down       | Yes     | แสดง Error Message ว่าระบบตรวจสอบสิทธิ์ขัดข้อง ผู้ใช้เข้าระบบไม่ได้ |
+| RADIUS Timeout    | Yes     | หลัง 5 วินาที ระบบหยุดรอและแสดง Timeout Error |
+| Invalid Username  | Yes     | ขึ้นข้อความรหัสผ่านหรือผู้ใช้ไม่ถูกต้อง และไม่ได้ JWT |
+| Invalid Password  | Yes     | ขึ้นข้อความรหัสผ่านหรือผู้ใช้ไม่ถูกต้อง และไม่ได้ JWT |
+| Invalid JWT       | Yes     | ระบบตอบ 401 Unauthorized บังคับล็อกอินใหม่ |
+| Expired JWT       | Yes     | ระบบใช้ Refresh Token ขอ JWT ใหม่เบื้องหลัง (ถ้า Refresh หมดอายุด้วย บังคับเข้าหน้าล็อกอิน) |
+| Missing JWT       | Yes     | ระบบตอบ 401 Unauthorized บังคับเข้าหน้าล็อกอิน |
+| Nginx Down        | Yes     | เว็บโหลดไม่ขึ้น (Connection Refused) |
+| Central Auth Down | Yes     | เข้าหน้าเว็บได้ แต่พอกดล็อกอินระบบจะขึ้น 502 Bad Gateway |
+| Web App Down      | Yes     | เข้าหน้าเว็บแล้วจะขึ้นจอขาว หรือ API ดึงข้อมูลเกรดไม่ขึ้น (502 Bad Gateway) |
+| Database Down     | Yes     | ล็อกอินได้ (ถ้าระบบ Auth แคชไว้) แต่จะเปิดดูเกรดหรือปฏิทินไม่ขึ้น แจ้งเตือนข้อผิดพลาดดึงข้อมูล |
 
 ---
 
@@ -781,22 +836,21 @@ Access Granted
 
 **ต้องทดสอบ Performance หรือไม่?**
 
-* [ ] Yes
-* [ ] No
+* [x] Yes
 
 ถ้าต้องทดสอบ:
 
 **จำนวนผู้ใช้พร้อมกัน:**
 
-TODO: ____ users
+TODO: 500 users
 
 **จำนวน Login ต่อวินาที:**
 
-TODO: ____ requests/sec
+TODO: 50 requests/sec
 
 **Maximum Response Time:**
 
-TODO: ____ ms
+TODO: 500 ms
 
 ---
 
@@ -804,16 +858,15 @@ TODO: ____ ms
 
 ต้องทดสอบ:
 
-* [ ] Password ไม่ปรากฏใน Web Application
-* [ ] Password ไม่ถูกเก็บใน JWT
-* [ ] JWT Signature ไม่สามารถปลอมแปลงได้
-* [ ] JWT มี Expiration
-* [ ] HTTPOnly Cookie
-* [ ] Secure Cookie
-* [ ] HTTPS
-* [ ] Unauthorized User ไม่สามารถเข้าถึง Protected Resource
-* [ ] User ไม่สามารถเปลี่ยน Role ใน JWT เองได้
-* [ ] อื่น ๆ: TODO
+* [x] Password ไม่ปรากฏใน Web Application หรือ Console Log
+* [x] Password ไม่ถูกเก็บใน JWT
+* [x] JWT Signature ไม่สามารถปลอมแปลงได้
+* [x] JWT มี Expiration Time ชัดเจน
+* [x] Refresh Token ถูกเก็บแบบ HTTPOnly Cookie (เพื่อป้องกัน XSS)
+* [x] Secure Cookie (ส่งผ่าน HTTPS เท่านั้น ใน Production)
+* [x] ระบบจำกัดให้ Unauthorized User ไม่สามารถเข้าถึงข้อมูลเกรด (Protected Resource) ได้
+* [x] User ไม่สามารถเปลี่ยน Role ใน JWT เองได้
+* [x] ป้องกัน SQL Injection และ XSS ในช่อง Input ทุกช่อง
 
 ---
 
@@ -821,19 +874,16 @@ TODO: ____ ms
 
 ระบบจะถือว่า **ผ่าน** เมื่อ:
 
-* [ ] User สามารถ Login ได้
-* [ ] Authentication ผ่าน RADIUS
-* [ ] Login สำเร็จแล้วได้รับ JWT
-* [ ] Web Application ตรวจสอบ JWT ได้
-* [ ] User ที่ไม่มี JWT ไม่สามารถเข้า Protected Resource
-* [ ] Invalid JWT ถูกปฏิเสธ
-* [ ] Expired JWT ถูกปฏิเสธ
-* [ ] RADIUS Error ถูกจัดการอย่างเหมาะสม
-* [ ] Docker Compose สามารถ Start ระบบได้
-* [ ] Nginx สามารถ Route Request ได้
-* [ ] TODO
-* [ ] TODO
-* [ ] TODO
+* [x] User สามารถ Login ได้ด้วยรหัสนักศึกษา
+* [x] Authentication ผ่านระบบจำลองของ RADIUS อย่างถูกต้อง
+* [x] Login สำเร็จแล้วได้รับ JWT และเก็บสถานะ Session
+* [x] Web Application ตรวจสอบ JWT ได้
+* [x] User ที่ไม่มี JWT ไม่สามารถเข้า Protected Resource (ดูเกรด) ได้
+* [x] Invalid / Expired JWT ถูกจัดการได้อย่างถูกต้อง (ทำ Silent Refresh ได้)
+* [x] RADIUS Error ถูกจัดการอย่างเหมาะสม ไม่ทำระบบค้าง
+* [x] Docker Compose สามารถ Start ระบบได้ครบทุกตัวในคำสั่งเดียว
+* [x] Nginx สามารถ Route Request ระหว่าง Frontend, Backend และ Auth ได้สมบูรณ์
+* [x] ผู้ใช้สามารถเข้ามาดูปฏิทินและเกรดในครั้งถัดไปได้ทันที โดยไม่ต้องกรอกรหัสผ่านซ้ำ (ฟีเจอร์ Remember Me ทำงานสมบูรณ์)
 
 ---
 
@@ -841,28 +891,28 @@ TODO: ____ ms
 
 **Operating System:**
 
-TODO:
+TODO:Windows 10/11
 
 **Docker Version:**
 
-TODO:
+TODO:Docker Engine 24.0 หรือสูงกว่า
 
 **Docker Compose Version:**
 
-TODO:
+TODO:Docker Compose v2.20 หรือสูงกว่า
 
 **Browser:**
 
-TODO:
+TODO:Google Chrome
 
 **Browser Version:**
 
-TODO:
+TODO:เวอร์ชันล่าสุดที่มีการอัปเดต
 
 **Testing URL:**
 
-TODO:
+TODO:http://localhost
 
 **Other Requirements:**
 
-TODO:
+TODO:โปรแกรม Postman หรือ cURL สำหรับใช้ทดสอบยิง API (API Testing) โดยไม่ต้องผ่านหน้าเว็บ
