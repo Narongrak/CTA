@@ -229,13 +229,13 @@ TODO:
 
 ## 7.1 Database Require
 
-ใช้อะไรทำ Database:
+ใช้อะไรทำ Database: ใช้ PostgreSQL และรันผ่าน Docker
 
 TODO:
 
 ## 7.2 Database Purpose
 
-ใช้เก็บอะไรใน Database:
+ใช้เก็บอะไรใน Database: ใช้เก็บข้อมูลผู้ใช้ เกรด และปฏิทินการศึกษา
 
 TODO:
 
@@ -253,13 +253,57 @@ TODO:
 
 เพิ่ม Table:
 
-TODO:
+TODO: users
 
-| Column   | Type    | Description |
-| -------- | ------- | ----------- |
-| id       | INT     | User ID     |
-| username | VARCHAR | Username    |
-| role     | VARCHAR | User Role   |
+| Column   | Type    | Description     |
+| -------- | ------- | --------------- |
+| id       | INT     | รหัสผู้ใช้      |
+| username | VARCHAR | ชื่อผู้ใช้      |
+| password | VARCHAR | รหัสผ่าน        |
+| role     | VARCHAR | สิทธิ์ของผู้ใช้ |
+
+TODO: students
+
+| Column     | Type    | Description        |
+| ---------- | ------- | ------------------ |
+| id         | INT     | รหัสข้อมูลนักศึกษา |
+| student_id | VARCHAR | รหัสนักศึกษา       |
+| name       | VARCHAR | ชื่อ-นามสกุล       |
+| email      | VARCHAR | อีเมล              |
+| major      | VARCHAR | สาขาวิชา           |
+
+TODO: grades
+
+| Column     | Type    | Description  |
+| ---------- | ------- | ------------ |
+| id         | INT     | รหัสเกรด     |
+| student_id | INT     | รหัสนักศึกษา |
+| subject_id | INT     | รหัสวิชา     |
+| semester   | VARCHAR | ภาคการศึกษา  |
+| grade      | VARCHAR | เกรด         |
+
+TODO: academic_calendar
+
+| Column      | Type    | Description   |
+| ----------- | ------- | ------------- |
+| id          | INT     | รหัสกิจกรรม   |
+| title       | VARCHAR | ชื่อกิจกรรม   |
+| description | TEXT    | รายละเอียด    |
+| start_date  | DATE    | วันที่เริ่ม   |
+| end_date    | DATE    | วันที่สิ้นสุด |
+
+TODO: audit_logs
+
+| Column     | Type      | Description                 |
+| ---------- | --------- | --------------------------- |
+| id         | INT       | รหัส Log                    |
+| user_id    | INT       | รหัสผู้ใช้                  |
+| action     | VARCHAR   | การกระทำ เช่น Login, Logout |
+| created_at | TIMESTAMP | วันและเวลาที่ทำรายการ       |
+
+
+
+TODO
 
 # 8 Error Handling
 
@@ -267,29 +311,29 @@ TODO:
 
 กรณีต่าง ๆ ต้องแสดงผลอย่างไร?
 
-Invalid Username / Password
+Invalid Username / Password 
 
-TODO:
+TODO: แสดงข้อความว่า “Username หรือ Password ไม่ถูกต้อง” และให้ผู้ใช้ลอง Login ใหม่
 
 RADIUS Server Down
 
-TODO:
+TODO: แสดงข้อความว่า “ไม่สามารถเชื่อมต่อระบบยืนยันตัวตนได้ กรุณาลองใหม่ภายหลัง” และไม่อนุญาตให้ Login
 
 RADIUS Timeout
 
-TODO:
+TODO: แสดงข้อความว่า “ระบบใช้เวลาตอบกลับนานเกินไป กรุณาลองใหม่” และให้ระบบลองเชื่อมต่อใหม่ตามจำนวนครั้งที่กำหนด
 
 Invalid JWT
 
-TODO:
+TODO: แสดงข้อความว่า “Session ไม่ถูกต้อง กรุณา Login ใหม่” และนำผู้ใช้กลับไปหน้า Login
 
 Expired JWT
 
-TODO:
+TODO: แสดงข้อความว่า “Session หมดอายุ กรุณา Login ใหม่” แล้ว Redirect กลับไปยัง Central Auth
 
 Unauthorized User
 
-TODO:
+TODO: แสดงข้อความว่า “คุณไม่มีสิทธิ์เข้าถึงหน้านี้” และไม่อนุญาตให้เข้าถึงข้อมูลที่ไม่มีสิทธิ์ เช่น Student ไม่สามารถเข้าเมนูของ Admin ได้
 
 # 9. Testing Requirements
 
